@@ -7,11 +7,7 @@ from astropy.io import fits
 st.markdown(
 """
 <style>
-.stApp h1 {
-    color: #ffffff !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
+
 
 /* =========================
    🌌 BASE BACKGROUND
@@ -27,14 +23,27 @@ st.markdown(
    🪐 TYPOGRAPHY (FIXED HIERARCHY)
 ========================= */
 
-h1 {
-    color: #f8fafc !important;
-    font-size: 2.6rem !important;
-    font-weight: 800 !important;
-    text-align: center;
-    margin-bottom: 1rem;
-}
+st.markdown(
+"""
+<h1 style="
+    color:white;
+    text-align:center;
+    font-size:42px;
+    font-weight:800;
+">
+🪐 ExoFinder AI
+</h1>
 
+<p style="
+    text-align:center;
+    color:#cbd5e1;
+    font-size:16px;
+">
+Exoplanet Transit Detection + Habitability Analysis
+</p>
+""",
+unsafe_allow_html=True
+)
 h2 {
     color: #e5e7eb !important;
     font-size: 1.7rem !important;
