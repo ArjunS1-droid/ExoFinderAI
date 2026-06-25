@@ -4,13 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
 
-st.markdown(
-"""
+st.markdown("""
 <style>
 
-
 /* =========================
-   🌌 BASE BACKGROUND
+   🌌 SPACE BACKGROUND
 ========================= */
 
 .stApp {
@@ -19,52 +17,39 @@ st.markdown(
     font-family: 'Segoe UI', sans-serif;
 }
 
+/* ⭐ subtle stars */
+.stApp {
+    background-image:
+        radial-gradient(white 1px, transparent 1px);
+    background-size: 60px 60px;
+    background-attachment: fixed;
+}
+
 /* =========================
-   🪐 TYPOGRAPHY (FIXED HIERARCHY)
+   🪐 TITLE (ExoFinderAI)
 ========================= */
 
-st.markdown(
-"""
-<h1 style="
-    color:white;
-    text-align:center;
-    font-size:42px;
-    font-weight:800;
-">
-🪐 ExoFinder AI
-</h1>
-
-<p style="
-    text-align:center;
-    color:#cbd5e1;
-    font-size:16px;
-">
-Exoplanet Transit Detection + Habitability Analysis
-</p>
-""",
-unsafe_allow_html=True
-)
-h2 {
-    color: #e5e7eb !important;
-    font-size: 1.7rem !important;
-    font-weight: 650 !important;
-    margin-top: 1.2rem;
+h1 {
+    color: #f8fafc !important;
+    font-size: 44px !important;
+    font-weight: 900 !important;
+    text-align: center;
+    letter-spacing: 1px;
 }
 
-h3 {
+/* subtitle */
+h2, h3 {
     color: #cbd5e1 !important;
-    font-size: 1.3rem !important;
-    font-weight: 500 !important;
 }
 
 /* =========================
-   📦 METRIC CARDS (NASA STYLE)
+   📦 METRIC CARDS
 ========================= */
 
 div[data-testid="stMetric"] {
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 16px;
+    border-radius: 15px;
     padding: 12px;
     transition: 0.3s ease;
 }
@@ -74,20 +59,15 @@ div[data-testid="stMetric"]:hover {
     border: 1px solid rgba(125,211,252,0.4);
 }
 
-/* Metric text fix */
-div[data-testid="stMetric"] * {
-    color: #e5e7eb !important;
-}
-
 /* =========================
-   📁 FILE UPLOADER (FIXED)
+   📁 FILE UPLOADER
 ========================= */
 
 [data-testid="stFileUploader"] {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.15);
     border-radius: 12px;
-    padding: 12px;
+    padding: 10px;
 }
 
 /* uploader text */
@@ -99,18 +79,16 @@ div[data-testid="stMetric"] * {
 [data-testid="stFileUploader"] button {
     background: #111827 !important;
     color: #e5e7eb !important;
-    border: 1px solid rgba(255,255,255,0.2) !important;
     border-radius: 8px !important;
 }
 
 /* hover button */
 [data-testid="stFileUploader"] button:hover {
     background: #1f2937 !important;
-    border: 1px solid rgba(125,211,252,0.4) !important;
 }
 
 /* =========================
-   🎛 BUTTONS
+   🎛 GENERAL BUTTONS
 ========================= */
 
 button {
@@ -120,15 +98,7 @@ button {
 
 button:hover {
     transform: scale(1.02);
-}
-
-/* =========================
-   📊 DATA TABLE
-========================= */
-
-div[data-testid="stDataFrame"] {
-    border-radius: 12px;
-    overflow: hidden;
+    border: 1px solid rgba(125,211,252,0.4);
 }
 
 /* =========================
@@ -140,15 +110,15 @@ section[data-testid="stSidebar"] {
 }
 
 /* =========================
-   ✨ INFO BOXES
+   📊 DATAFRAME
 ========================= */
 
-.stAlert {
+div[data-testid="stDataFrame"] {
     border-radius: 12px;
 }
 
 /* =========================
-   🚀 SAFE SPACING
+   🚀 CLEAN SPACING
 ========================= */
 
 .block-container {
@@ -156,12 +126,8 @@ section[data-testid="stSidebar"] {
     padding-bottom: 2rem;
 }
 
-
 </style>
-""",
-unsafe_allow_html=True
-)
-
+""", unsafe_allow_html=True)
 # =========================
 # TRANSIT DETECTION
 # =========================
