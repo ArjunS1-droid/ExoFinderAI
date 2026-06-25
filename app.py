@@ -9,9 +9,9 @@ st.set_page_config(page_title="ExoFinder AI", layout="wide")
 st.title("🪐 ExoFinder AI")
 st.subheader("Exoplanet Transit Detection and Habitability Analysis")
 
-# ==========================================
+# ==================================================
 # TRANSIT DETECTION SECTION
-# ==========================================
+# ==================================================
 
 st.header("🔭 Exoplanet Transit Detection")
 
@@ -25,7 +25,6 @@ if transit_file is not None:
 
     try:
 
-        # CSV FILE
         if transit_file.name.endswith(".csv"):
 
             df = pd.read_csv(transit_file)
@@ -34,10 +33,9 @@ if transit_file is not None:
                 st.error("CSV must contain Time and Flux columns.")
                 st.stop()
 
-            time = df.iloc[:, 0]
-            flux = df.iloc[:, 1]
+            time = df.iloc[:, 0].values
+            flux = df.iloc[:, 1].values
 
-        # FITS FILE
         else:
 
             hdul = fits.open(transit_file)
@@ -67,8 +65,7 @@ if transit_file is not None:
         min_flux = np.min(flux)
 
         transit_depth = (
-            (median_flux - min_flux)
-            / median_flux
+            (median_flux - min_flux) / median_flux
         ) * 100
 
         dip_threshold = median_flux * 0.99
@@ -105,31 +102,29 @@ if transit_file is not None:
 
         st.success("Transit Analysis Complete")
 
-        col1, col2, col3, col4 = st.columns(4)
+        c1, c2, c3, c4 = st.columns(4)
 
-        col1.metric(
+        c1.metric(
             "Transit Depth (%)",
             f"{transit_depth:.4f}"
         )
 
-        col2.metric(
+        c2.metric(
             "Transit Duration",
             f"{transit_duration}"
         )
 
-        col3.metric(
+        c3.metric(
             "Estimated Period",
             f"{orbital_period:.4f}"
         )
 
-        col4.metric(
+        c4.metric(
             "Confidence (%)",
             f"{confidence:.1f}"
         )
 
-        fig, ax = plt.subplots(
-            figsize=(10, 4)
-        )
+        fig, ax = plt.subplots(figsize=(10, 4))
 
         ax.plot(time, flux)
 
@@ -141,13 +136,11 @@ if transit_file is not None:
 
     except Exception as e:
 
-        st.error(
-            f"Error reading transit file: {e}"
-        )
-       
-# ==========================================
+        st.error(f"Transit File Error: {e}")
+
+# ==================================================
 # HABITABILITY SECTION
-# ==========================================
+# ==================================================
 
 st.markdown("---")
 
@@ -167,14 +160,13 @@ if habitability_file is not None:
 
             hab_df = pd.read_csv(
                 habitability_file,
-                comment = "#"
+                comment="#",
+                on_bad_lines="skip"
             )
 
         else:
 
-            hdul = fits.open(
-                habitability_file
-            )
+            hdul = fits.open(habitability_file)
 
             data = hdul[1].data
 
@@ -182,86 +174,70 @@ if habitability_file is not None:
                 np.array(data)
             )
 
-        st.subheader(
-            "Uploaded Habitability Data"
-        )
+        st.subheader("Uploaded Habitability Data")
 
         st.dataframe(hab_df.head())
-         planet_name = hab_df["kepler_name"].iloc[0]
 
-        st.subheader(f"Planet: {planet_name}")
+        # Planet selector
+        if "kepler_name" in hab_df.columns:
 
-        st.write("Columns found in file:")
-        st.write(hab_df.columns.tolist())
-
-        columns = [
-            str(c).lower()
-            for c in hab_df.columns
-        ]
-
-       score = 0
-
-# Radius
-if "koi_prad" in columns:
-
-    radius = float(
-        hab_df.iloc[
-            0,
-            columns.index("koi_prad")
-        ]
-    )
-
-    if 0.8 <= radius <= 1.8:
-        score += 35
-
-# Equilibrium Temperature
-if "koi_teq" in columns:
-
-    temp = float(
-        hab_df.iloc[
-            0,
-            columns.index("koi_teq")
-        ]
-    )
-
-    if 200 <= temp <= 350:
-        score += 35
-
-# Stellar Flux
-if "koi_insol" in columns:
-
-    insol = float(
-        hab_df.iloc[
-            0,
-            columns.index("koi_insol")
-        ]
-    )
-
-    if 0.25 <= insol <= 2.0:
-        score += 30
-        st.write("Planet Radius:", radius)
-        st.write("Equilibrium Temperature:", temp)
-        st.write("Stellar Flux:", insol)
-            if 0.75 <= flux_star <= 1.5:
-                score += 30
-
-        if score >= 80:
-
-            status = (
-                "🟢 Highly Habitable"
-            )
-
-        elif score >= 60:
-
-            status = (
-                "🟡 Potentially Habitable"
+            planet_names = hab_df["kepler_name"].fillna(
+                hab_df["kepoi_name"]
             )
 
         else:
 
-            status = (
-                "🔴 Low Habitability"
-            )
+            planet_names = hab_df["kepoi_name"]
+
+        selected_planet = st.selectbox(
+            "Select Planet",
+            planet_names
+        )
+
+        selected_row = hab_df[
+            planet_names == selected_planet
+        ].iloc[0]
+
+        st.subheader(
+            f"🪐 Planet: {selected_planet}"
+        )
+
+        score = 0
+
+        radius = selected_row.get("koi_prad", np.nan)
+        temp = selected_row.get("koi_teq", np.nan)
+        insol = selected_row.get("koi_insol", np.nan)
+
+        if pd.notna(radius):
+
+            if 0.8 <= radius <= 1.8:
+                score += 35
+
+        if pd.notna(temp):
+
+            if 200 <= temp <= 350:
+                score += 35
+
+        if pd.notna(insol):
+
+            if 0.25 <= insol <= 2.0:
+                score += 30
+
+        st.write(f"**Planet Radius:** {radius}")
+        st.write(f"**Equilibrium Temperature:** {temp} K")
+        st.write(f"**Stellar Flux:** {insol}")
+
+        if score >= 80:
+
+            status = "🟢 Highly Habitable"
+
+        elif score >= 60:
+
+            status = "🟡 Potentially Habitable"
+
+        else:
+
+            status = "🔴 Low Habitability"
 
         st.metric(
             "Habitability Score",
@@ -278,17 +254,12 @@ if "koi_insol" in columns:
             f"Habitability Error: {e}"
         )
 
-# ==========================================
+# ==================================================
 # FOOTER
-# ==========================================
+# ==================================================
 
 st.markdown("---")
 
 st.write(
     "🚀 ExoFinder AI | ISRO Hackathon Prototype"
 )
-
-
-
-
-        
