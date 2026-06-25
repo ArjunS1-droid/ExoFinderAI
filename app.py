@@ -166,7 +166,8 @@ if habitability_file is not None:
         if habitability_file.name.endswith(".csv"):
 
             hab_df = pd.read_csv(
-                habitability_file
+                habitability_file,
+                comment = "#"
             )
 
         else:
