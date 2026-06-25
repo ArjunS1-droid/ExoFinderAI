@@ -4,29 +4,148 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
 
-# =========================
-# SAFE SPACE THEME (NO CRASH)
-# =========================
-
-st.markdown("""
+st.markdown(
+"""
 <style>
+
+/* =========================
+   🌌 BASE BACKGROUND
+========================= */
+
 .stApp {
     background: radial-gradient(circle at 20% 20%, #0b1026, #000000);
-}
-h1 {
-    color: #e5e7eb !important;
-    font-size: 2.5rem !important;
-    text-align: center;
-    font-weight: 700;
-    display: block !important;
+    color: #e5e7eb;
+    font-family: 'Segoe UI', sans-serif;
 }
 
-h2, h3 {
-    color: #cbd5e1 !important;
-    display: block !important;
+/* =========================
+   🪐 TYPOGRAPHY (FIXED HIERARCHY)
+========================= */
+
+h1 {
+    color: #f8fafc !important;
+    font-size: 2.6rem !important;
+    font-weight: 800 !important;
+    text-align: center;
+    margin-bottom: 1rem;
 }
+
+h2 {
+    color: #e5e7eb !important;
+    font-size: 1.7rem !important;
+    font-weight: 650 !important;
+    margin-top: 1.2rem;
+}
+
+h3 {
+    color: #cbd5e1 !important;
+    font-size: 1.3rem !important;
+    font-weight: 500 !important;
+}
+
+/* =========================
+   📦 METRIC CARDS (NASA STYLE)
+========================= */
+
+div[data-testid="stMetric"] {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 12px;
+    transition: 0.3s ease;
+}
+
+div[data-testid="stMetric"]:hover {
+    transform: translateY(-3px);
+    border: 1px solid rgba(125,211,252,0.4);
+}
+
+/* Metric text fix */
+div[data-testid="stMetric"] * {
+    color: #e5e7eb !important;
+}
+
+/* =========================
+   📁 FILE UPLOADER (FIXED)
+========================= */
+
+[data-testid="stFileUploader"] {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+/* uploader text */
+[data-testid="stFileUploader"] * {
+    color: #e5e7eb !important;
+}
+
+/* browse button */
+[data-testid="stFileUploader"] button {
+    background: #111827 !important;
+    color: #e5e7eb !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    border-radius: 8px !important;
+}
+
+/* hover button */
+[data-testid="stFileUploader"] button:hover {
+    background: #1f2937 !important;
+    border: 1px solid rgba(125,211,252,0.4) !important;
+}
+
+/* =========================
+   🎛 BUTTONS
+========================= */
+
+button {
+    border-radius: 10px !important;
+    transition: 0.2s ease;
+}
+
+button:hover {
+    transform: scale(1.02);
+}
+
+/* =========================
+   📊 DATA TABLE
+========================= */
+
+div[data-testid="stDataFrame"] {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* =========================
+   🌠 SIDEBAR
+========================= */
+
+section[data-testid="stSidebar"] {
+    background: rgba(10, 15, 40, 0.9);
+}
+
+/* =========================
+   ✨ INFO BOXES
+========================= */
+
+.stAlert {
+    border-radius: 12px;
+}
+
+/* =========================
+   🚀 SAFE SPACING
+========================= */
+
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
 </style>
-""", unsafe_allow_html=True)
+""",
+unsafe_allow_html=True
+)
 
 # =========================
 # TRANSIT DETECTION
