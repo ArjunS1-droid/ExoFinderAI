@@ -187,6 +187,8 @@ if habitability_file is not None:
         )
 
         st.dataframe(hab_df.head())
+        st.write("Columns found in file:")
+        st.write(hab_df.columns.tolist())
 
         columns = [
             str(c).lower()
