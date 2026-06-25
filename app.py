@@ -144,7 +144,7 @@ if transit_file is not None:
         st.error(
             f"Error reading transit file: {e}"
         )
-
+       
 # ==========================================
 # HABITABILITY SECTION
 # ==========================================
@@ -187,6 +187,10 @@ if habitability_file is not None:
         )
 
         st.dataframe(hab_df.head())
+         planet_name = hab_df["kepler_name"].iloc[0]
+
+        st.subheader(f"Planet: {planet_name}")
+
         st.write("Columns found in file:")
         st.write(hab_df.columns.tolist())
 
@@ -195,50 +199,49 @@ if habitability_file is not None:
             for c in hab_df.columns
         ]
 
-        score = 0
+       score = 0
 
-        # Planet Radius
-        if "planet_radius" in columns:
+# Radius
+if "koi_prad" in columns:
 
-            radius = float(
-                hab_df.iloc[
-                    0,
-                    columns.index(
-                        "planet_radius"
-                    )
-                ]
-            )
+    radius = float(
+        hab_df.iloc[
+            0,
+            columns.index("koi_prad")
+        ]
+    )
 
-            if 0.8 <= radius <= 1.5:
-                score += 35
+    if 0.8 <= radius <= 1.8:
+        score += 35
 
-        # Equilibrium Temperature
-        if "equilibrium_temp" in columns:
+# Equilibrium Temperature
+if "koi_teq" in columns:
 
-            temp = float(
-                hab_df.iloc[
-                    0,
-                    columns.index(
-                        "equilibrium_temp"
-                    )
-                ]
-            )
+    temp = float(
+        hab_df.iloc[
+            0,
+            columns.index("koi_teq")
+        ]
+    )
 
-            if 240 <= temp <= 320:
-                score += 35
+    if 200 <= temp <= 350:
+        score += 35
 
-        # Stellar Flux
-        if "stellar_flux" in columns:
+# Stellar Flux
+if "koi_insol" in columns:
 
-            flux_star = float(
-                hab_df.iloc[
-                    0,
-                    columns.index(
-                        "stellar_flux"
-                    )
-                ]
-            )
+    insol = float(
+        hab_df.iloc[
+            0,
+            columns.index("koi_insol")
+        ]
+    )
 
+    if 0.25 <= insol <= 2.0:
+        score += 30
+        st.write("Planet Radius:", radius)
+        st.write("Equilibrium Temperature:", temp)
+        st.write("Stellar Flux:", insol)
             if 0.75 <= flux_star <= 1.5:
                 score += 30
 
