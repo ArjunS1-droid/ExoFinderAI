@@ -1,184 +1,77 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
+
+# =========================
+# SAFE SPACE THEME (NO CRASH)
+# =========================
+
 st.markdown(
 """
 <style>
 
-/* Background */
+/* 🌌 Background */
 .stApp {
     background: radial-gradient(circle at 20% 20%, #0b1026, #000000);
+    color: #e5e7eb;
+    font-family: 'Segoe UI', sans-serif;
 }
 
-/* SAFE STAR LAYER (no ::before) */
+/* Clean stars (SAFE version) */
 .stApp {
     background-image:
         radial-gradient(white 1px, transparent 1px);
-    background-size: 50px 50px;
-    animation: starMove 120s linear infinite;
+    background-size: 60px 60px;
+    background-attachment: fixed;
+    opacity: 0.98;
 }
 
-/* Slow movement */
-@keyframes starMove {
-    from { background-position: 0 0; }
-    to { background-position: -1000px 1000px; }
-}
-
-</style>
-""",
-unsafe_allow_html=True
-)
-/* =========================
-   🪐 HEADINGS
-========================= */
-
+/* Headings */
 h1, h2, h3 {
     color: #e5e7eb !important;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-}
-
-h1 {
     text-align: center;
 }
 
-/* =========================
-   📦 GLASS CARDS (METRICS)
-========================= */
-
+/* Metrics cards */
 div[data-testid="stMetric"] {
     background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 16px;
-    padding: 12px;
-    backdrop-filter: blur(12px);
-    transition: 0.3s ease;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 14px;
+    padding: 10px;
 }
 
-div[data-testid="stMetric"]:hover {
-    transform: translateY(-3px);
-    border: 1px solid rgba(125,211,252,0.4);
-}
-
-/* Metric text */
-div[data-testid="stMetric"] label,
-div[data-testid="stMetric"] div {
-    color: #e5e7eb !important;
-}
-
-/* =========================
-   📁 FILE UPLOADER FIX
-========================= */
-
+/* File uploader fix */
 [data-testid="stFileUploader"] {
     background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.2);
     border-radius: 12px;
     padding: 10px;
 }
 
-/* uploader text */
 [data-testid="stFileUploader"] * {
     color: #e5e7eb !important;
 }
 
-/* browse button */
-button[data-testid="baseButton-secondary"] {
-    background: #111827 !important;
-    color: #e5e7eb !important;
-    border: 1px solid rgba(255,255,255,0.2) !important;
+button {
     border-radius: 8px !important;
-}
-
-/* hover button */
-button[data-testid="baseButton-secondary"]:hover {
-    background: #1f2937 !important;
-}
-
-/* =========================
-   🎛 BUTTONS (GLOBAL)
-========================= */
-
-[data-testid="stFileUploader"] {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 12px;
-    padding: 12px;
-}
-
-/* ALL text inside uploader */
-[data-testid="stFileUploader"] * {
-    color: #e5e7eb !important;
-}
-
-/* The actual "Browse files" button */
-[data-testid="stFileUploader"] button {
-    background-color: #111827 !important;
-    color: #e5e7eb !important;
-    border: 1px solid rgba(255,255,255,0.2) !important;
-    border-radius: 8px !important;
-}
-
-/* Hover state */
-[data-testid="stFileUploader"] button:hover {
-    background-color: #1f2937 !important;
-    border: 1px solid rgba(125,211,252,0.5) !important;
-}
-
-/* Fix weird white label area */
-[data-testid="stFileUploaderDropzone"] {
-    background: transparent !important;
-    border: none !important;
-}
-
-/* =========================
-   🌠 SIDEBAR
-========================= */
-
-section[data-testid="stSidebar"] {
-    background: rgba(10, 15, 40, 0.9);
-}
-
-/* =========================
-   📊 DATAFRAME
-========================= */
-
-div[data-testid="stDataFrame"] {
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-/* =========================
-   ✨ INFO / SUCCESS BOXES
-========================= */
-
-.stAlert {
-    border-radius: 12px;
-}
-
-/* =========================
-   🚀 SPACING CLEANUP
-========================= */
-
-.block-container {
-    padding-top: 2rem;
-    padding-bottom: 2rem;
 }
 
 </style>
 """,
 unsafe_allow_html=True
 )
-st.set_page_config(page_title="ExoFinder AI", layout="wide")
-
-st.title("🪐 ExoFinder AI")
-st.subheader("Exoplanet Transit Detection + NASA-Style Habitability Index")
 
 # =========================
-# TRANSIT SECTION
+# TITLE
+# =========================
+
+st.title("🪐 ExoFinder AI")
+st.subheader("Exoplanet Transit Detection + Habitability Index")
+
+# =========================
+# TRANSIT DETECTION
 # =========================
 
 st.header("🔭 Transit Detection")
@@ -205,20 +98,18 @@ if transit_file is not None:
             hdul = fits.open(transit_file)
             data = hdul[1].data
 
-            cols = [c.upper() for c in data.names]
-
-            if "TIME" in cols:
-                time = data["TIME"]
-            else:
-                time = np.arange(len(data))
-
-            if "PDCSAP_FLUX" in cols:
+            if "PDCSAP_FLUX" in data.names:
                 flux = data["PDCSAP_FLUX"]
-            elif "SAP_FLUX" in cols:
+            elif "SAP_FLUX" in data.names:
                 flux = data["SAP_FLUX"]
             else:
                 st.error("No usable flux column found.")
                 st.stop()
+
+            if "TIME" in data.names:
+                time = data["TIME"]
+            else:
+                time = np.arange(len(flux))
 
         mask = np.isfinite(time) & np.isfinite(flux)
         time = np.array(time)[mask]
@@ -250,17 +141,14 @@ if transit_file is not None:
 
         c1, c2, c3, c4 = st.columns(4)
 
-        c1.metric("Transit Depth (%)", f"{transit_depth:.4f}")
+        c1.metric("Depth (%)", f"{transit_depth:.2f}")
         c2.metric("Duration", f"{transit_duration}")
-        c3.metric("Period", f"{orbital_period:.4f}")
-        c4.metric("Confidence (%)", f"{confidence:.1f}")
+        c3.metric("Period", f"{orbital_period:.2f}")
+        c4.metric("Confidence", f"{confidence:.1f}%")
 
         fig, ax = plt.subplots()
         ax.plot(time, flux)
-        ax.set_xlabel("Time")
-        ax.set_ylabel("Flux")
         ax.set_title("Light Curve")
-
         st.pyplot(fig)
 
     except Exception as e:
@@ -271,99 +159,66 @@ if transit_file is not None:
 # =========================
 
 st.markdown("---")
-st.header("🌍 Habitability Index (NASA Style)")
+st.header("🌍 Habitability Index")
 
 habitability_file = st.file_uploader(
-    "Upload Habitability Data (CSV or FITS)",
+    "Upload Kepler Habitability Data (CSV/FITS)",
     type=["csv", "fits", "fit"],
     key="habitability"
 )
 
-def gaussian_score(x, ideal, sigma):
-    return np.exp(-((x - ideal) ** 2) / (2 * sigma ** 2))
+def gaussian(x, mu, sigma):
+    return np.exp(-((x - mu) ** 2) / (2 * sigma ** 2))
 
 if habitability_file is not None:
 
     try:
 
         if habitability_file.name.endswith(".csv"):
-
-            hab_df = pd.read_csv(
-                habitability_file,
-                comment="#",
-                on_bad_lines="skip"
-            )
-
+            hab_df = pd.read_csv(habitability_file, on_bad_lines="skip")
         else:
-
             hdul = fits.open(habitability_file)
-            data = hdul[1].data
-            hab_df = pd.DataFrame(np.array(data))
+            hab_df = pd.DataFrame(np.array(hdul[1].data))
 
-        st.subheader("Data Preview")
+        st.subheader("Dataset Preview")
         st.dataframe(hab_df.head())
 
-        # Planet selection
         if "kepler_name" in hab_df.columns:
             names = hab_df["kepler_name"].fillna(hab_df["kepoi_name"])
         else:
             names = hab_df["kepoi_name"]
 
         selected = st.selectbox("Select Planet", names)
+        row = hab_df[names == selected].iloc[0]
 
-        selected_row = hab_df[names == selected].iloc[0]
+        radius = row.get("koi_prad", np.nan)
+        temp = row.get("koi_teq", np.nan)
+        flux = row.get("koi_insol", np.nan)
 
-        st.subheader(f"🪐 Planet: {selected}")
+        r_score = gaussian(radius, 1.0, 0.5) if pd.notna(radius) else 0
+        t_score = gaussian(temp, 250, 80) if pd.notna(temp) else 0
+        f_score = gaussian(flux, 1.0, 0.5) if pd.notna(flux) else 0
 
-        # Extract values
-        radius = selected_row.get("koi_prad", np.nan)
-        temp = selected_row.get("koi_teq", np.nan)
-        flux_star = selected_row.get("koi_insol", np.nan)
-
-        # NASA-style Gaussian scoring
-        radius_score = 0
-        temp_score = 0
-        flux_score = 0
-
-        if pd.notna(radius):
-            radius_score = gaussian_score(radius, 1.0, 0.5)
-
-        if pd.notna(temp):
-            temp_score = gaussian_score(temp, 250, 80)
-           
-
-        if pd.notna(flux_star):
-            flux_score = gaussian_score(flux_star, 1.0, 0.5)
-
-        habitability_index = (
-            0.4 * radius_score +
-            0.3 * temp_score +
-            0.3 * flux_score
-        )
-
+        habitability_index = 0.4*r_score + 0.3*t_score + 0.3*f_score
         habitability_percent = habitability_index * 100
 
-        st.metric("Habitability Index", f"{habitability_index:.2f} / 1.00")
-        st.metric("Habitability Score", f"{habitability_percent:.1f} %")
+        st.metric("Index", f"{habitability_index:.2f}/1.00")
+        st.metric("Score", f"{habitability_percent:.1f}%")
 
-        # Classification
         if habitability_index >= 0.75:
-            status = "🟢 High Potential Habitability"
+            st.success("High Habitability Potential 🟢")
         elif habitability_index >= 0.5:
-            status = "🟡 Moderate Potential Habitability"
+            st.warning("Moderate Habitability 🟡")
         else:
-            status = "🔴 Low Habitability"
+            st.error("Low Habitability 🔴")
 
-        st.write(f"### {status}")
-
-        # Display values
-        st.write(f"Planet Radius: {radius} Earth radii")
+        st.write(f"Radius: {radius} R⊕")
         st.write(f"Temperature: {temp} K")
-        st.write(f"Stellar Flux: {flux_star}")
+        st.write(f"Flux: {flux} S⊕")
 
         st.info(
-            "This index is a simplified NASA-inspired model based on similarity to Earth. "
-            "It does not include atmosphere, water, or biosignatures."
+            "This is a simplified Earth-similarity model based on KOI parameters. "
+            "Real habitability depends on atmosphere, water, and climate."
         )
 
     except Exception as e:
