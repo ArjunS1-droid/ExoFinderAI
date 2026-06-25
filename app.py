@@ -1,3 +1,75 @@
+st.markdown(
+"""
+<style>
+
+/* 🌌 Space background */
+.stApp {
+    background: radial-gradient(circle at 20% 20%, #0b0f2a, #000000);
+    overflow-x: hidden;
+}
+
+/* ✨ Animated stars */
+.stApp::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: transparent;
+    background-image: radial-gradient(white 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: moveStars 60s linear infinite;
+    opacity: 0.4;
+    z-index: 0;
+}
+
+@keyframes moveStars {
+    from { transform: translate(0,0); }
+    to { transform: translate(-500px,-500px); }
+}
+
+/* Ensure content stays above stars */
+.main {
+    position: relative;
+    z-index: 1;
+}
+
+/* 🌠 Glow effect for titles */
+h1, h2, h3 {
+    color: #7dd3fc;
+    text-shadow: 0px 0px 10px #38bdf8;
+}
+
+/* 📦 Glass card effect */
+div[data-testid="stMetric"] {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(125,211,252,0.3);
+    border-radius: 15px;
+    padding: 10px;
+    backdrop-filter: blur(10px);
+    transition: 0.3s ease;
+}
+
+/* 🖱️ Hover animation */
+div[data-testid="stMetric"]:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 0px 20px #38bdf8;
+}
+
+/* 🎛 Buttons glow */
+button {
+    transition: 0.3s ease;
+    border-radius: 10px !important;
+}
+
+button:hover {
+    box-shadow: 0px 0px 15px #60a5fa;
+    transform: scale(1.02);
+}
+
+</style>
+""",
+unsafe_allow_html=True
+)
 import streamlit as st
 import pandas as pd
 import numpy as np
