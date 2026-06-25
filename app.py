@@ -8,80 +8,140 @@ st.markdown(
 """
 <style>
 
-/* 🌌 Space background */
+/* =========================
+   🌌 GLOBAL THEME
+========================= */
+
 .stApp {
-    background: radial-gradient(circle at 20% 20%, #0b0f2a, #000000);
-    overflow-x: hidden;
+    background: radial-gradient(circle at 20% 20%, #0b1026, #000000);
+    color: #e5e7eb;
+    font-family: 'Segoe UI', sans-serif;
 }
 
-/* ✨ Animated stars */
-.stApp::before {
-    content: "";
-    position: absolute;
-    width: 200%;
-    height: 200%;
-    background: transparent;
-    background-image: radial-gradient(white 1px, transparent 1px);
-    background-size: 50px 50px;
-    animation: moveStars 60s linear infinite;
-    opacity: 0.4;
-    z-index: 0;
-}
-
-@keyframes moveStars {
-    from { transform: translate(0,0); }
-    to { transform: translate(-500px,-500px); }
-}
-
-/* Ensure content stays above stars */
-.main {
-    position: relative;
-    z-index: 1;
-}
-
-/* 🌠 Glow effect for titles */
-h1, h2, h3 {
-    color: #e5e7eb !important;   /* soft white */
+/* Remove all unwanted text shadows */
+* {
     text-shadow: none !important;
 }
-h1 {
-    text-shadow: 0 0 10px rgba(125,211,252,0.2);
-}
-p, span, div {
-    color: #d1d5db !important;   /* light gray */
+
+/* =========================
+   🪐 HEADINGS
+========================= */
+
+h1, h2, h3 {
+    color: #e5e7eb !important;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
-/* 📦 Glass card effect */
+h1 {
+    text-align: center;
+}
+
+/* =========================
+   📦 GLASS CARDS (METRICS)
+========================= */
+
 div[data-testid="stMetric"] {
     background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 15px;
-    padding: 10px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 16px;
+    padding: 12px;
+    backdrop-filter: blur(12px);
+    transition: 0.3s ease;
+}
+
+div[data-testid="stMetric"]:hover {
+    transform: translateY(-3px);
+    border: 1px solid rgba(125,211,252,0.4);
+}
+
+/* Metric text */
+div[data-testid="stMetric"] label,
+div[data-testid="stMetric"] div {
     color: #e5e7eb !important;
 }
 
-/* 🖱️ Hover animation */
-div[data-testid="stMetric"]:hover {
-    transform: scale(1.05);
-    box-shadow: 0px 0px 20px #38bdf8;
+/* =========================
+   📁 FILE UPLOADER FIX
+========================= */
+
+[data-testid="stFileUploader"] {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 10px;
 }
 
-/* 🎛 Buttons glow */
+/* uploader text */
+[data-testid="stFileUploader"] * {
+    color: #e5e7eb !important;
+}
+
+/* browse button */
+button[data-testid="baseButton-secondary"] {
+    background: #111827 !important;
+    color: #e5e7eb !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    border-radius: 8px !important;
+}
+
+/* hover button */
+button[data-testid="baseButton-secondary"]:hover {
+    background: #1f2937 !important;
+}
+
+/* =========================
+   🎛 BUTTONS (GLOBAL)
+========================= */
+
 button {
-    transition: 0.3s ease;
     border-radius: 10px !important;
+    transition: 0.2s ease;
 }
 
 button:hover {
-    box-shadow: 0px 0px 15px #60a5fa;
     transform: scale(1.02);
+    border: 1px solid rgba(125,211,252,0.4);
+}
+
+/* =========================
+   🌠 SIDEBAR
+========================= */
+
+section[data-testid="stSidebar"] {
+    background: rgba(10, 15, 40, 0.9);
+}
+
+/* =========================
+   📊 DATAFRAME
+========================= */
+
+div[data-testid="stDataFrame"] {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* =========================
+   ✨ INFO / SUCCESS BOXES
+========================= */
+
+.stAlert {
+    border-radius: 12px;
+}
+
+/* =========================
+   🚀 SPACING CLEANUP
+========================= */
+
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
 }
 
 </style>
 """,
 unsafe_allow_html=True
 )
-
 st.set_page_config(page_title="ExoFinder AI", layout="wide")
 
 st.title("🪐 ExoFinder AI")
