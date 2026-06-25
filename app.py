@@ -8,67 +8,13 @@ from astropy.io import fits
 # SAFE SPACE THEME (NO CRASH)
 # =========================
 
-st.markdown(
-"""
+st.markdown("""
 <style>
-
-/* 🌌 Background */
 .stApp {
     background: radial-gradient(circle at 20% 20%, #0b1026, #000000);
-    color: #e5e7eb;
-    font-family: 'Segoe UI', sans-serif;
 }
-
-/* Clean stars (SAFE version) */
-.stApp {
-    background-image:
-        radial-gradient(white 1px, transparent 1px);
-    background-size: 60px 60px;
-    background-attachment: fixed;
-    opacity: 0.98;
-}
-
-/* Headings */
-h1, h2, h3 {
-    color: #e5e7eb !important;
-    text-align: center;
-}
-
-/* Metrics cards */
-div[data-testid="stMetric"] {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 14px;
-    padding: 10px;
-}
-
-/* File uploader fix */
-[data-testid="stFileUploader"] {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 12px;
-    padding: 10px;
-}
-
-[data-testid="stFileUploader"] * {
-    color: #e5e7eb !important;
-}
-
-button {
-    border-radius: 8px !important;
-}
-
 </style>
-""",
-unsafe_allow_html=True
-)
-
-# =========================
-# TITLE
-# =========================
-
-st.title("🪐 ExoFinder AI")
-st.subheader("Exoplanet Transit Detection + Habitability Index")
+""", unsafe_allow_html=True)
 
 # =========================
 # TRANSIT DETECTION
