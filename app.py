@@ -13,6 +13,18 @@ st.markdown("""
 .stApp {
     background: radial-gradient(circle at 20% 20%, #0b1026, #000000);
 }
+h1 {
+    color: #e5e7eb !important;
+    font-size: 2.5rem !important;
+    text-align: center;
+    font-weight: 700;
+    display: block !important;
+}
+
+h2, h3 {
+    color: #cbd5e1 !important;
+    display: block !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
