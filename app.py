@@ -1,78 +1,179 @@
+```python
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
-from astropy.io import fits
 
-st.title("🌍 ExoFinderAI")
-st.write("Upload a FITS light curve file to detect possible exoplanets.")
+st.set_page_config(page_title="ExoFinder AI", layout="wide")
 
-uploaded_file = st.file_uploader(
-    "Upload FITS File",
-    type=["fits"]
-)
+st.title("🪐 ExoFinder AI")
+st.subheader("Exoplanet Detection & Habitability Assessment")
 
-if uploaded_file is not None:
-        with fits.open(uploaded_file) as hdul:
+tab1, tab2 = st.tabs(["Transit Detection", "Habitability Analysis"])
 
-            data = hdul[1].data
-            df = pd.DataFrame(data)
+# --------------------------
+# TAB 1 : TRANSIT DETECTION
+# --------------------------
 
-            st.subheader("Light Curve Data")
+with tab1:
+
+    st.header("Upload Light Curve Data")
+
+    lightcurve_file = st.file_uploader(
+        "Upload Light Curve CSV",
+        type=["csv"],
+        key="lc"
+    )
+
+    if lightcurve_file:
+
+        df = pd.read_csv(lightcurve_file)
+
+        if "time" not in df.columns or "flux" not in df.columns:
+            st.error("CSV must contain 'time' and 'flux' columns")
+        else:
+
+            st.subheader("Preview")
             st.write(df.head())
 
-            if "TIME" in df.columns and "SAP_FLUX" in df.columns:
+            fig, ax = plt.subplots(figsize=(10,4))
+            ax.plot(df["time"], df["flux"])
+            ax.set_xlabel("Time")
+            ax.set_ylabel("Flux")
+            ax.set_title("Light Curve")
 
-                fig, ax = plt.subplots(figsize=(10, 5))
+            st.pyplot(fig)
 
-                ax.plot(df["TIME"], df["SAP_FLUX"])
+            median_flux = df["flux"].median()
+            min_flux = df["flux"].min()
 
-                transit_idx = df["SAP_FLUX"].idxmin()
+            transit_depth = (
+                (median_flux - min_flux)
+                / median_flux
+            ) * 100
 
-                ax.scatter(
-                    df["TIME"][transit_idx],
-                    df["SAP_FLUX"][transit_idx]
+            threshold = median_flux * 0.99
+
+            transit_points = df[
+                df["flux"] < threshold
+            ]
+
+            if len(transit_points) > 1:
+                transit_duration = (
+                    transit_points["time"].max()
+                    - transit_points["time"].min()
                 )
+            else:
+                transit_duration = 0
 
-                ax.set_xlabel("Time")
-                ax.set_ylabel("SAP Flux")
-                ax.set_title("Light Curve")
+            st.subheader("Transit Results")
 
-                st.pyplot(fig)
+            st.metric(
+                "Transit Depth",
+                f"{transit_depth:.3f}%"
+            )
 
-                min_flux = df["SAP_FLUX"].min()
-                avg_flux = df["SAP_FLUX"].mean()
+            st.metric(
+                "Transit Duration",
+                f"{transit_duration:.3f}"
+            )
 
-                dip_percent = (
-                    (avg_flux - min_flux)
-                    / avg_flux
-                ) * 100
+            if transit_depth > 1:
 
                 confidence = min(
                     99,
-                    round(dip_percent * 20)
+                    50 +
+                    transit_depth * 10 +
+                    min(len(transit_points), 20)
                 )
 
-                st.subheader("Analysis")
-
-                st.metric(
-                    "Minimum Flux",
-                    round(min_flux, 2)
-                )
-
-                st.metric(
-                    "Average Flux",
-                    round(avg_flux, 2)
+                st.success(
+                    "Possible Exoplanet Transit Detected"
                 )
 
                 st.metric(
-                    "Brightness Dip %",
-                    round(dip_percent, 2)
+                    "Detection Confidence",
+                    f"{confidence:.1f}%"
                 )
 
-                if min_flux < 0.99 * avg_flux:
+            else:
+                st.warning(
+                    "No Significant Transit Found"
+                )
 
-                    st.success(
-                        "Possible Exoplanet Candidate Detected"
-                    )
+# --------------------------
+# TAB 2 : HABITABILITY
+# --------------------------
+
+with tab2:
+
+    st.header("Upload Planet Parameters")
+
+    planet_file = st.file_uploader(
+        "Upload Planet Data CSV",
+        type=["csv"],
+        key="planet"
+    )
+
+    if planet_file:
+
+        planet_df = pd.read_csv(planet_file)
+
+        st.write(planet_df)
+
+        row = planet_df.iloc[0]
+
+        radius = row["radius"]
+        mass = row["mass"]
+        star_temp = row["star_temperature"]
+        distance = row["distance_from_star"]
+
+        score = 0
+
+        # Radius
+        if 0.8 <= radius <= 1.5:
+            score += 25
+
+        # Mass
+        if 0.5 <= mass <= 5:
+            score += 25
+
+        # Habitable Zone
+        if 0.8 <= distance <= 1.5:
+            score += 25
+
+        # Star Temperature
+        if 4500 <= star_temp <= 6500:
+            score += 25
+
+        score = min(score, 100)
+
+        st.subheader("Habitability Results")
+
+        st.metric(
+            "Habitability Score",
+            f"{score}/100"
+        )
+
+        if score >= 75:
+            status = "Potentially Habitable"
+        elif score >= 50:
+            status = "Moderately Habitable"
+        else:
+            status = "Low Habitability"
+
+        st.write("### Status")
+        st.success(status)
+
+        confidence = min(
+            99,
+            score * 0.95
+        )
+
+        st.metric(
+            "AI Confidence Rate",
+            f"{confidence:.1f}%"
+        )
+```
+
 
         
