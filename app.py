@@ -216,9 +216,9 @@ if habitability_file is not None:
         if pd.notna(temp):
             if 150 <= temp <= 200:
                   score += 20
-  
             elif 200 <= temp <= 350:
                  score += 35
+                
    
 
  
@@ -257,6 +257,10 @@ if habitability_file is not None:
         st.write(
             f"### Classification: {status}"
         )
+        st.info(
+    "Habitability score is an AI-assisted estimate based on available planetary parameters. "
+    "It does not account for atmosphere, magnetic field, water content, or geological activity."
+)
 
     except Exception as e:
 
