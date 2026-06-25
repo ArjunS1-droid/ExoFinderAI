@@ -1,179 +1,121 @@
-```python
 import streamlit as st
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
+from astropy.io import fits
 
 st.set_page_config(page_title="ExoFinder AI", layout="wide")
 
 st.title("🪐 ExoFinder AI")
-st.subheader("Exoplanet Detection & Habitability Assessment")
+st.subheader("Exoplanet Transit Detection and Habitability Analysis")
 
-tab1, tab2 = st.tabs(["Transit Detection", "Habitability Analysis"])
+uploaded_file = st.file_uploader(
+    "Upload Light Curve Data (CSV or FITS)",
+    type=["csv", "fits", "fit"]
+)
 
-# --------------------------
-# TAB 1 : TRANSIT DETECTION
-# --------------------------
+if uploaded_file is not None:
 
-with tab1:
+    try:
+        # CSV FILE
+        if uploaded_file.name.endswith(".csv"):
 
-    st.header("Upload Light Curve Data")
+            df = pd.read_csv(uploaded_file)
 
-    lightcurve_file = st.file_uploader(
-        "Upload Light Curve CSV",
-        type=["csv"],
-        key="lc"
-    )
+            if len(df.columns) < 2:
+                st.error("CSV must contain Time and Flux columns.")
+                st.stop()
 
-    if lightcurve_file:
+            time = df.iloc[:, 0]
+            flux = df.iloc[:, 1]
 
-        df = pd.read_csv(lightcurve_file)
-
-        if "time" not in df.columns or "flux" not in df.columns:
-            st.error("CSV must contain 'time' and 'flux' columns")
+        # FITS FILE
         else:
 
-            st.subheader("Preview")
-            st.write(df.head())
+            hdul = fits.open(uploaded_file)
+            data = hdul[1].data
 
-            fig, ax = plt.subplots(figsize=(10,4))
-            ax.plot(df["time"], df["flux"])
-            ax.set_xlabel("Time")
-            ax.set_ylabel("Flux")
-            ax.set_title("Light Curve")
+            cols = [c.upper() for c in data.names]
 
-            st.pyplot(fig)
-
-            median_flux = df["flux"].median()
-            min_flux = df["flux"].min()
-
-            transit_depth = (
-                (median_flux - min_flux)
-                / median_flux
-            ) * 100
-
-            threshold = median_flux * 0.99
-
-            transit_points = df[
-                df["flux"] < threshold
-            ]
-
-            if len(transit_points) > 1:
-                transit_duration = (
-                    transit_points["time"].max()
-                    - transit_points["time"].min()
-                )
+            if "TIME" in cols:
+                time = data["TIME"]
             else:
-                transit_duration = 0
+                time = np.arange(len(data))
 
-            st.subheader("Transit Results")
-
-            st.metric(
-                "Transit Depth",
-                f"{transit_depth:.3f}%"
-            )
-
-            st.metric(
-                "Transit Duration",
-                f"{transit_duration:.3f}"
-            )
-
-            if transit_depth > 1:
-
-                confidence = min(
-                    99,
-                    50 +
-                    transit_depth * 10 +
-                    min(len(transit_points), 20)
-                )
-
-                st.success(
-                    "Possible Exoplanet Transit Detected"
-                )
-
-                st.metric(
-                    "Detection Confidence",
-                    f"{confidence:.1f}%"
-                )
-
+            if "PDCSAP_FLUX" in cols:
+                flux = data["PDCSAP_FLUX"]
+            elif "SAP_FLUX" in cols:
+                flux = data["SAP_FLUX"]
             else:
-                st.warning(
-                    "No Significant Transit Found"
-                )
+                st.error("No usable flux column found.")
+                st.stop()
 
-# --------------------------
-# TAB 2 : HABITABILITY
-# --------------------------
+        mask = np.isfinite(time) & np.isfinite(flux)
+        time = np.array(time)[mask]
+        flux = np.array(flux)[mask]
 
-with tab2:
+        median_flux = np.median(flux)
+        min_flux = np.min(flux)
 
-    st.header("Upload Planet Parameters")
+        transit_depth = ((median_flux - min_flux) / median_flux) * 100
 
-    planet_file = st.file_uploader(
-        "Upload Planet Data CSV",
-        type=["csv"],
-        key="planet"
-    )
+        dip_threshold = median_flux * 0.99
+        dip_indices = np.where(flux < dip_threshold)[0]
 
-    if planet_file:
+        if len(dip_indices) > 1:
+            transit_duration = len(dip_indices)
 
-        planet_df = pd.read_csv(planet_file)
+            dip_times = time[dip_indices]
 
-        st.write(planet_df)
-
-        row = planet_df.iloc[0]
-
-        radius = row["radius"]
-        mass = row["mass"]
-        star_temp = row["star_temperature"]
-        distance = row["distance_from_star"]
-
-        score = 0
-
-        # Radius
-        if 0.8 <= radius <= 1.5:
-            score += 25
-
-        # Mass
-        if 0.5 <= mass <= 5:
-            score += 25
-
-        # Habitable Zone
-        if 0.8 <= distance <= 1.5:
-            score += 25
-
-        # Star Temperature
-        if 4500 <= star_temp <= 6500:
-            score += 25
-
-        score = min(score, 100)
-
-        st.subheader("Habitability Results")
-
-        st.metric(
-            "Habitability Score",
-            f"{score}/100"
-        )
-
-        if score >= 75:
-            status = "Potentially Habitable"
-        elif score >= 50:
-            status = "Moderately Habitable"
+            if len(dip_times) > 2:
+                orbital_period = np.median(np.diff(dip_times))
+            else:
+                orbital_period = 0
         else:
-            status = "Low Habitability"
-
-        st.write("### Status")
-        st.success(status)
+            transit_duration = 0
+            orbital_period = 0
 
         confidence = min(
             99,
-            score * 0.95
+            max(
+                50,
+                50 + transit_depth * 4
+            )
         )
 
-        st.metric(
-            "AI Confidence Rate",
-            f"{confidence:.1f}%"
-        )
-```
+        st.success("Analysis Complete")
+
+        col1, col2, col3, col4 = st.columns(4)
+
+        col1.metric("Transit Depth (%)", f"{transit_depth:.4f}")
+        col2.metric("Transit Duration", f"{transit_duration}")
+        col3.metric("Estimated Period", f"{orbital_period:.4f}")
+        col4.metric("Confidence (%)", f"{confidence:.1f}")
+
+        st.subheader("Habitability Assessment")
+
+        if transit_depth < 1:
+            habitability = "Potentially Habitable"
+            score = 80
+        elif transit_depth < 3:
+            habitability = "Possibly Habitable"
+            score = 60
+        else:
+            habitability = "Low Habitability"
+            score = 30
+
+        st.write(f"**Classification:** {habitability}")
+        st.write(f"**Habitability Score:** {score}/100")
+
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.plot(time, flux)
+        ax.set_xlabel("Time")
+        ax.set_ylabel("Flux")
+        ax.set_title("Light Curve")
+        st.pyplot(fig)
+
+    except Exception as e:
+        st.error(f"Error reading file: {e}")
 
 
         
