@@ -41,18 +41,23 @@ st.markdown(
 
 /* 🌠 Glow effect for titles */
 h1, h2, h3 {
-    color: black !important;
+    color: #e5e7eb !important;   /* soft white */
     text-shadow: none !important;
+}
+h1 {
+    text-shadow: 0 0 10px rgba(125,211,252,0.2);
+}
+p, span, div {
+    color: #d1d5db !important;   /* light gray */
 }
 
 /* 📦 Glass card effect */
 div[data-testid="stMetric"] {
     background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(125,211,252,0.3);
+    border: 1px solid rgba(255,255,255,0.15);
     border-radius: 15px;
     padding: 10px;
-    backdrop-filter: blur(10px);
-    transition: 0.3s ease;
+    color: #e5e7eb !important;
 }
 
 /* 🖱️ Hover animation */
