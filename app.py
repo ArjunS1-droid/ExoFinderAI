@@ -161,7 +161,8 @@ if habitability_file is not None:
             radius_score = gaussian_score(radius, 1.0, 0.5)
 
         if pd.notna(temp):
-            temp_score = gaussian_score(temp, 288, 50)
+            temp_score = gaussian_score(temp, 250, 80)
+           
 
         if pd.notna(flux_star):
             flux_score = gaussian_score(flux_star, 1.0, 0.5)
