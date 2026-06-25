@@ -8,48 +8,29 @@ st.markdown(
 """
 <style>
 
-/* =========================
-   🌌 GLOBAL THEME
-========================= */
-
+/* Background */
 .stApp {
     background: radial-gradient(circle at 20% 20%, #0b1026, #000000);
-    overflow: hidden;
-    position: relative;
 }
 
-/* ⭐ STAR LAYER */
-.stApp::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: transparent;
-    background-image: radial-gradient(white 1px, transparent 1px);
+/* SAFE STAR LAYER (no ::before) */
+.stApp {
+    background-image:
+        radial-gradient(white 1px, transparent 1px);
     background-size: 50px 50px;
-    animation: moveStars 80s linear infinite;
-    opacity: 0.25;
-    z-index: 0;
-    pointer-events: none;
+    animation: starMove 120s linear infinite;
 }
 
-/* Keep app content above stars */
-.main, .block-container {
-    position: relative;
-    z-index: 1;
+/* Slow movement */
+@keyframes starMove {
+    from { background-position: 0 0; }
+    to { background-position: -1000px 1000px; }
 }
 
-/* ⭐ STAR MOVEMENT */
-@keyframes moveStars {
-    from {
-        transform: translate(0, 0);
-    }
-    to {
-        transform: translate(-500px, -500px);
-    }
-}
+</style>
+""",
+unsafe_allow_html=True
+)
 /* =========================
    🪐 HEADINGS
 ========================= */
