@@ -141,6 +141,15 @@ section[data-testid="stSidebar"] {
     padding-top: 2rem;
     padding-bottom: 2rem;
 }
+h1 {
+    color: #ffffff !important;
+    font-size: 2.8rem !important;
+    font-weight: 800 !important;
+    text-align: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    display: block !important;
+}
 
 </style>
 """,
