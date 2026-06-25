@@ -8,119 +8,95 @@ st.markdown("""
 <style>
 
 /* =========================
-   🌌 SPACE BACKGROUND
+   🌌 DARK SPACE BACKGROUND
 ========================= */
-
 .stApp {
-    background: radial-gradient(circle at 20% 20%, #0b1026, #000000);
-    color: #e5e7eb;
-    font-family: 'Segoe UI', sans-serif;
-}
-
-/* ⭐ subtle stars */
-.stApp {
-    background-image:
-        radial-gradient(white 1px, transparent 1px);
-    background-size: 60px 60px;
-    background-attachment: fixed;
+    background: radial-gradient(circle at 20% 20%, #070b1a, #000000);
+    color: #ffffff;
 }
 
 /* =========================
-   🪐 TITLE (ExoFinderAI)
+   🪐 MAIN TITLE (FIXED CONTRAST)
 ========================= */
-
 h1 {
-    color: #f8fafc !important;
+    color: #ffffff !important;
     font-size: 44px !important;
     font-weight: 900 !important;
     text-align: center;
-    letter-spacing: 1px;
-}
-
-/* subtitle */
-h2, h3 {
-    color: #cbd5e1 !important;
 }
 
 /* =========================
-   📦 METRIC CARDS
+   📌 SECTION HEADINGS (FIXED)
 ========================= */
-
-div[data-testid="stMetric"] {
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 15px;
-    padding: 12px;
-    transition: 0.3s ease;
+h2 {
+    color: #ffffff !important;
+    font-size: 28px !important;
+    font-weight: 700;
 }
 
-div[data-testid="stMetric"]:hover {
-    transform: translateY(-3px);
-    border: 1px solid rgba(125,211,252,0.4);
+h3 {
+    color: #dbeafe !important;
 }
 
 /* =========================
-   📁 FILE UPLOADER
+   📁 UPLOADER (FIXED VISIBILITY)
 ========================= */
-
 [data-testid="stFileUploader"] {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.25);
     border-radius: 12px;
-    padding: 10px;
+    padding: 12px;
 }
 
-/* uploader text */
+/* text inside uploader */
 [data-testid="stFileUploader"] * {
-    color: #e5e7eb !important;
+    color: #ffffff !important;
 }
 
-/* browse button */
+/* upload button */
 [data-testid="stFileUploader"] button {
-    background: #111827 !important;
-    color: #e5e7eb !important;
+    background: #1f2937 !important;
+    color: #ffffff !important;
+    border: 1px solid #60a5fa !important;
     border-radius: 8px !important;
 }
 
-/* hover button */
+/* hover */
 [data-testid="stFileUploader"] button:hover {
-    background: #1f2937 !important;
+    background: #111827 !important;
+    border: 1px solid #93c5fd !important;
 }
 
 /* =========================
-   🎛 GENERAL BUTTONS
+   📦 METRICS (MAKE THEM POP)
 ========================= */
+div[data-testid="stMetric"] {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 14px;
+    padding: 12px;
+}
 
+/* metric text */
+div[data-testid="stMetric"] * {
+    color: #ffffff !important;
+}
+
+/* =========================
+   🎛 BUTTONS
+========================= */
 button {
     border-radius: 10px !important;
     transition: 0.2s ease;
 }
 
 button:hover {
-    transform: scale(1.02);
-    border: 1px solid rgba(125,211,252,0.4);
+    transform: scale(1.03);
 }
 
 /* =========================
-   🌠 SIDEBAR
+   🌠 CENTER CONTENT CLEAN
 ========================= */
-
-section[data-testid="stSidebar"] {
-    background: rgba(10, 15, 40, 0.9);
-}
-
-/* =========================
-   📊 DATAFRAME
-========================= */
-
-div[data-testid="stDataFrame"] {
-    border-radius: 12px;
-}
-
-/* =========================
-   🚀 CLEAN SPACING
-========================= */
-
 .block-container {
     padding-top: 2rem;
     padding-bottom: 2rem;
