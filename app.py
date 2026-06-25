@@ -94,14 +94,36 @@ button[data-testid="baseButton-secondary"]:hover {
    🎛 BUTTONS (GLOBAL)
 ========================= */
 
-button {
-    border-radius: 10px !important;
-    transition: 0.2s ease;
+[data-testid="stFileUploader"] {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 12px;
 }
 
-button:hover {
-    transform: scale(1.02);
-    border: 1px solid rgba(125,211,252,0.4);
+/* ALL text inside uploader */
+[data-testid="stFileUploader"] * {
+    color: #e5e7eb !important;
+}
+
+/* The actual "Browse files" button */
+[data-testid="stFileUploader"] button {
+    background-color: #111827 !important;
+    color: #e5e7eb !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+    border-radius: 8px !important;
+}
+
+/* Hover state */
+[data-testid="stFileUploader"] button:hover {
+    background-color: #1f2937 !important;
+    border: 1px solid rgba(125,211,252,0.5) !important;
+}
+
+/* Fix weird white label area */
+[data-testid="stFileUploaderDropzone"] {
+    background: transparent !important;
+    border: none !important;
 }
 
 /* =========================
