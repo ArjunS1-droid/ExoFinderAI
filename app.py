@@ -7,13 +7,13 @@ from astropy.io import fits
 st.set_page_config(page_title="ExoFinder AI", layout="wide")
 
 st.title("🪐 ExoFinder AI")
-st.subheader("Exoplanet Transit Detection and Habitability Analysis")
+st.subheader("Exoplanet Transit Detection + NASA-Style Habitability Index")
 
-# ==================================================
-# TRANSIT DETECTION SECTION
-# ==================================================
+# =========================
+# TRANSIT SECTION
+# =========================
 
-st.header("🔭 Exoplanet Transit Detection")
+st.header("🔭 Transit Detection")
 
 transit_file = st.file_uploader(
     "Upload Light Curve Data (CSV or FITS)",
@@ -28,10 +28,6 @@ if transit_file is not None:
         if transit_file.name.endswith(".csv"):
 
             df = pd.read_csv(transit_file)
-
-            if len(df.columns) < 2:
-                st.error("CSV must contain Time and Flux columns.")
-                st.stop()
 
             time = df.iloc[:, 0].values
             flux = df.iloc[:, 1].values
@@ -57,77 +53,42 @@ if transit_file is not None:
                 st.stop()
 
         mask = np.isfinite(time) & np.isfinite(flux)
-
         time = np.array(time)[mask]
         flux = np.array(flux)[mask]
 
         median_flux = np.median(flux)
         min_flux = np.min(flux)
 
-        transit_depth = (
-            (median_flux - min_flux) / median_flux
-        ) * 100
+        transit_depth = ((median_flux - min_flux) / median_flux) * 100
 
         dip_threshold = median_flux * 0.99
-
-        dip_indices = np.where(
-            flux < dip_threshold
-        )[0]
+        dip_indices = np.where(flux < dip_threshold)[0]
 
         if len(dip_indices) > 1:
-
             transit_duration = len(dip_indices)
-
             dip_times = time[dip_indices]
 
             if len(dip_times) > 2:
-                orbital_period = np.median(
-                    np.diff(dip_times)
-                )
+                orbital_period = np.median(np.diff(dip_times))
             else:
                 orbital_period = 0
-
         else:
-
             transit_duration = 0
             orbital_period = 0
 
-        confidence = min(
-            99,
-            max(
-                50,
-                50 + transit_depth * 4
-            )
-        )
+        confidence = min(99, max(50, 50 + transit_depth * 4))
 
         st.success("Transit Analysis Complete")
 
         c1, c2, c3, c4 = st.columns(4)
 
-        c1.metric(
-            "Transit Depth (%)",
-            f"{transit_depth:.4f}"
-        )
+        c1.metric("Transit Depth (%)", f"{transit_depth:.4f}")
+        c2.metric("Duration", f"{transit_duration}")
+        c3.metric("Period", f"{orbital_period:.4f}")
+        c4.metric("Confidence (%)", f"{confidence:.1f}")
 
-        c2.metric(
-            "Transit Duration",
-            f"{transit_duration}"
-        )
-
-        c3.metric(
-            "Estimated Period",
-            f"{orbital_period:.4f}"
-        )
-
-        c4.metric(
-            "Confidence (%)",
-            f"{confidence:.1f}"
-        )
-
-        fig, ax = plt.subplots(figsize=(10, 4))
-
+        fig, ax = plt.subplots()
         ax.plot(time, flux)
-
         ax.set_xlabel("Time")
         ax.set_ylabel("Flux")
         ax.set_title("Light Curve")
@@ -135,22 +96,23 @@ if transit_file is not None:
         st.pyplot(fig)
 
     except Exception as e:
+        st.error(f"Transit Error: {e}")
 
-        st.error(f"Transit File Error: {e}")
-
-# ==================================================
+# =========================
 # HABITABILITY SECTION
-# ==================================================
+# =========================
 
 st.markdown("---")
-
-st.header("🌍 Habitability Analysis")
+st.header("🌍 Habitability Index (NASA Style)")
 
 habitability_file = st.file_uploader(
     "Upload Habitability Data (CSV or FITS)",
     type=["csv", "fits", "fit"],
     key="habitability"
 )
+
+def gaussian_score(x, ideal, sigma):
+    return np.exp(-((x - ideal) ** 2) / (2 * sigma ** 2))
 
 if habitability_file is not None:
 
@@ -167,113 +129,80 @@ if habitability_file is not None:
         else:
 
             hdul = fits.open(habitability_file)
-
             data = hdul[1].data
+            hab_df = pd.DataFrame(np.array(data))
 
-            hab_df = pd.DataFrame(
-                np.array(data)
-            )
-
-        st.subheader("Uploaded Habitability Data")
-
+        st.subheader("Data Preview")
         st.dataframe(hab_df.head())
 
-        # Planet selector
+        # Planet selection
         if "kepler_name" in hab_df.columns:
-
-            planet_names = hab_df["kepler_name"].fillna(
-                hab_df["kepoi_name"]
-            )
-
+            names = hab_df["kepler_name"].fillna(hab_df["kepoi_name"])
         else:
+            names = hab_df["kepoi_name"]
 
-            planet_names = hab_df["kepoi_name"]
+        selected = st.selectbox("Select Planet", names)
 
-        selected_planet = st.selectbox(
-            "Select Planet",
-            planet_names
-        )
+        selected_row = hab_df[names == selected].iloc[0]
 
-        selected_row = hab_df[
-            planet_names == selected_planet
-        ].iloc[0]
+        st.subheader(f"🪐 Planet: {selected}")
 
-        st.subheader(
-            f"🪐 Planet: {selected_planet}"
-        )
-
-        score = 0
-
+        # Extract values
         radius = selected_row.get("koi_prad", np.nan)
         temp = selected_row.get("koi_teq", np.nan)
-        insol = selected_row.get("koi_insol", np.nan)
+        flux_star = selected_row.get("koi_insol", np.nan)
+
+        # NASA-style Gaussian scoring
+        radius_score = 0
+        temp_score = 0
+        flux_score = 0
 
         if pd.notna(radius):
-
-            if 0.8 <= radius <= 1.8:
-                score += 35
+            radius_score = gaussian_score(radius, 1.0, 0.5)
 
         if pd.notna(temp):
-            if 150 <= temp <= 200:
-                  score += 20
-            elif 200 <= temp <= 350:
-                 score += 35
-                
-   
+            temp_score = gaussian_score(temp, 288, 50)
 
- 
+        if pd.notna(flux_star):
+            flux_score = gaussian_score(flux_star, 1.0, 0.5)
 
-        if pd.notna(insol):
-            if 0.20 <= insol < 0.25:
-                score += 15
-    
-            elif 0.25 <= insol <= 2.0:
-                   score += 30
-   
+        habitability_index = (
+            0.4 * radius_score +
+            0.3 * temp_score +
+            0.3 * flux_score
+        )
 
-           
+        habitability_percent = habitability_index * 100
 
-        st.write(f"**Planet Radius:** {radius}")
-        st.write(f"**Equilibrium Temperature:** {temp} K")
-        st.write(f"**Stellar Flux:** {insol}")
+        st.metric("Habitability Index", f"{habitability_index:.2f} / 1.00")
+        st.metric("Habitability Score", f"{habitability_percent:.1f} %")
 
-        if score >= 80:
-
-            status = "🟢 Highly Habitable"
-
-        elif score >= 60:
-
-            status = "🟡 Potentially Habitable"
-
+        # Classification
+        if habitability_index >= 0.75:
+            status = "🟢 High Potential Habitability"
+        elif habitability_index >= 0.5:
+            status = "🟡 Moderate Potential Habitability"
         else:
-
             status = "🔴 Low Habitability"
 
-        st.metric(
-            "Habitability Score",
-            f"{score}/100"
-        )
+        st.write(f"### {status}")
 
-        st.write(
-            f"### Classification: {status}"
-        )
+        # Display values
+        st.write(f"Planet Radius: {radius} Earth radii")
+        st.write(f"Temperature: {temp} K")
+        st.write(f"Stellar Flux: {flux_star}")
+
         st.info(
-    "Habitability score is an AI-assisted estimate based on available planetary parameters. "
-    "It does not account for atmosphere, magnetic field, water content, or geological activity."
-)
+            "This index is a simplified NASA-inspired model based on similarity to Earth. "
+            "It does not include atmosphere, water, or biosignatures."
+        )
 
     except Exception as e:
+        st.error(f"Habitability Error: {e}")
 
-        st.error(
-            f"Habitability Error: {e}"
-        )
-
-# ==================================================
+# =========================
 # FOOTER
-# ==================================================
+# =========================
 
 st.markdown("---")
-
-st.write(
-    "🚀 ExoFinder AI | ISRO Hackathon Prototype"
-)
+st.write("🚀 ExoFinder AI | ISRO Hackathon Project")
