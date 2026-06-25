@@ -41,8 +41,8 @@ st.markdown(
 
 /* 🌠 Glow effect for titles */
 h1, h2, h3 {
-    color: #7dd3fc;
-    text-shadow: 0px 0px 10px #38bdf8;
+    color: black !important;
+    text-shadow: none !important;
 }
 
 /* 📦 Glass card effect */
