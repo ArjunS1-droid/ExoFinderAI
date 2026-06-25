@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
+st.set_page_config(page_title="ExoFinder AI", layout="wide")
 
 st.markdown("""
 <style>
