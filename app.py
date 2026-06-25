@@ -214,14 +214,24 @@ if habitability_file is not None:
                 score += 35
 
         if pd.notna(temp):
+            if 150 <= temp <= 200:
+                  score += 20
+  
+            elif 200 <= temp <= 350:
+                 score += 35
+   
 
-            if 200 <= temp <= 350:
-                score += 35
+ 
 
         if pd.notna(insol):
+            if 0.20 <= insol < 0.25:
+                score += 15
+    
+            elif 0.25 <= insol <= 2.0:
+                   score += 30
+   
 
-            if 0.25 <= insol <= 2.0:
-                score += 30
+           
 
         st.write(f"**Planet Radius:** {radius}")
         st.write(f"**Equilibrium Temperature:** {temp} K")
