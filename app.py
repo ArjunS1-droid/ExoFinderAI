@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
 import base64
-
+import time
 # =========================
 # PAGE SETUP
 # =========================
@@ -32,17 +32,25 @@ def get_base64(image_file):
     with open(image_file, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-background = get_base64("space_background.jpg")
+home_bg = get_base64("space_background.jpg")
+analysis_bg = get_base64("analysis_background.jpg")
 
 # =========================
 # CSS
 # =========================
 
+
+
+if st.session_state.page == "home":
+    current_bg = home_bg
+else:
+    current_bg = analysis_bg
+
 st.markdown(f"""
 <style>
-
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;800&family=Audiowide&display=swap');
 .stApp {{
-background-image:url("data:image/jpg;base64,{background}");
+background-image:url("data:image/jpg;base64,{current_bg}");
 background-size:120% 120%;
 background-position:center;
 background-attachment:fixed;
@@ -54,10 +62,31 @@ animation:spaceMove 25s infinite alternate ease-in-out;
 0% {{ background-position:0% 0%; }}
 100% {{ background-position:100% 100%; }}
 }}
+@keyframes starMove {{
+    from {{
+        transform: translateY(0px);
+    }}
+    to {{
+        transform: translateY(-800px);
+    }}
+}}
 
-[data-testid="stMetricValue"],
-[data-testid="stMetricLabel"] {{
-color:white !important;
+[data-testid="stMetricValue"] {{
+    font-family: 'Exo 2', sans-serif !important;
+    font-size: 30px !important;
+    font-weight: 630 !important;
+    color: #F8FAFF !important;
+    padding-bottom: 3px;
+}}
+
+[data-testid="stMetricLabel"] p {{
+    font-family: 'Orbitron', sans-serif !important;
+    font-size: 17px !important;
+    font-weight: 580 !important;
+    color: #F8FAFF !important;
+    border-bottom: 2px solid rgba(125,249,255,0.9);
+    box-shadow: 0 3px 10px rgba(125,249,255,0.5);
+    padding-bottom: 3px;
 }}
 h1 {{
 font-family:'Orbitron', sans-serif !important;
@@ -80,6 +109,97 @@ letter-spacing:3px;
     padding: 35px;
     border-radius: 25px;
     border: 1px solid rgba(255,255,255,0.12);
+}}
+div[data-testid="stHeading"]
+ h2 {{
+    font-family: 'Exo 2', sans-serif !important;
+    font-size: 34px !important;
+    font-weight: 700 !important;
+
+    background: linear-gradient(
+        90deg,
+        #7DF9FF,
+        #B388FF,
+        #FFFFFF
+    );
+
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    text-shadow: 0 0 15px rgba(125,249,255,0.3);
+}}
+.planet-name {{
+    font-family: 'Orbitron', sans-serif;
+    font-size: 40px;
+    font-weight: 700;
+    color: #F8FAFF;
+    margin-top: 9px;
+    margin-bottom: 25px;
+    text-shadow:
+        0 0 8px rgba(0,0,0,0.9),
+        0 0 20px rgba(10,20,40,0.8);
+}}
+div[data-testid="stMetric"] {{
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+
+    padding: 20px;
+    margin: 10px;
+
+    box-shadow:
+        0 8px 32px rgba(0,0,0,0.35);
+
+    transition: all 0.3s ease;
+}}
+div[data-testid="stMetric"] > div {{
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    text-align: center !important;
+
+}}
+
+
+div[data-testid="stMetricLabel"] {{
+
+    width: 100% !important;
+
+    display: flex !important;
+
+    justify-content: center !important;
+
+    align-items: center !important;
+
+    text-align: center !important;
+
+}}
+
+
+div[data-testid="stMetricLabel"] p {{
+
+    text-align: center !important;
+
+    width: 100% !important;
+
+}}
+
+
+div[data-testid="stMetricValue"] {{
+
+    width: 100% !important;
+
+    text-align: center !important;
+
 }}
 .stButton button {{
     background: linear-gradient(90deg, #0F2027, #203A43);
@@ -122,11 +242,98 @@ div.stButton {{
     left: 0;
     width: 100%;
     height: 100%;
+    background: rgba(0,0,0,0.30);
+    z-index: -2;
+    pointer-events: none;
+}}
+.stApp::after {{
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 
-    background: rgba(0, 0, 0, 0.45);
+    background:
+        radial-gradient(2px 2px at 20% 30%, white, transparent),
+        radial-gradient(2px 2px at 70% 50%, #7DF9FF, transparent),
+        radial-gradient(1px 1px at 40% 80%, white, transparent),
+        radial-gradient(2px 2px at 90% 20%, #B388FF, transparent),
+        radial-gradient(2px 2px at 10% 70%, white, transparent),
+        radial-gradient(1px 1px at 80% 90%, #7DF9FF, transparent);
+
+    background-size: 400px 400px;
+
+    animation: starMove 80s linear infinite;
 
     z-index: -1;
     pointer-events: none;
+}}
+/* =========================
+   MOBILE RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 768px) {{
+
+h1 {{
+
+    font-size: 38px !important;
+
+    line-height: 1.1;
+
+    margin-top: 20px !important;
+
+    margin-bottom: 30px !important;
+
+}}
+
+
+.hero {{
+
+    position: relative;
+
+    top: 40px;
+
+    left: 15px;
+
+    right:15px;
+
+    max-width:90%;
+
+    padding:25px;
+
+}}
+
+
+div[data-testid="stHeading"] h2 {{
+
+    font-size:28px !important;
+
+}}
+
+
+.hero p {{
+
+    font-size:18px;
+
+}}
+
+
+.stButton button {{
+
+    padding:15px 40px;
+
+    font-size:18px;
+
+}}
+
+
+div.stButton {{
+
+    margin-top:120px;
+
+}}
+
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -177,10 +384,14 @@ if st.session_state.page == "home":
     """, unsafe_allow_html=True)
 
     if st.button("🚀 START MISSION"):
-        st.session_state.started = True
-        st.session_state.page = "analysis"
-        st.rerun()
 
+        st.session_state.started = True
+
+        time.sleep(0.5)
+
+        st.session_state.page = "analysis"
+
+        st.rerun()
 # =========================
 # ANALYSIS PAGE
 # =========================
@@ -192,7 +403,17 @@ if st.session_state.page == "analysis" and st.session_state.started:
     # =========================
 
     st.header("🛰️ Transit Detection")
-    st.caption("Upload Kepler or TESS light curves to detect planetary transits.")
+    st.markdown("""
+    <div style="
+        font-size: 20px;
+        font-weight: 600;
+        text-align: left;
+        color: #cfe8ff;
+        margin-bottom: 10px;
+">
+Upload Kepler or TESS light curve to detect planetary transits
+</div>
+""", unsafe_allow_html=True)
 
     transit_file = st.file_uploader(
         "Upload Light Curve (CSV/FITS)",
@@ -201,9 +422,9 @@ if st.session_state.page == "analysis" and st.session_state.started:
     )
 
     if transit_file is not None:
-
+        
         try:
-
+            
             if transit_file.name.endswith(".csv"):
                 df = pd.read_csv(transit_file)
 
@@ -274,13 +495,25 @@ if st.session_state.page == "analysis" and st.session_state.started:
 
             shape_score = asymmetry + sharpness
 
-            st.success("Transit Analysis Complete")
+            st.markdown("""
+            <div style="
+                font-size: 26px;
+                font-weight: 900;
+                text-align: center;
+                padding: 14px;
+                border-radius: 15px;
+                background: rgba(0,255,200,0.08);
+                color: #00ffd5;
+                text-shadow: 0 0 12px #00ffd5;
+                margin-top: 10px;
+            ">
+            🛰️ TRANSIT ANALYSIS COMPLETE
+            </div>
+            """, unsafe_allow_html=True)
 
-            c1, c2, c3 = st.columns(3)
-
-            c1.metric("Transit Depth", f"{depth:.2f}%")
-            c2.metric("Data Points", len(flux))
-            c3.metric("Noise", f"{noise:.5f}")
+            # =========================
+            # 2 × 2 METRIC GRID
+            # =========================
 
             snr = depth / (noise * 100)
 
@@ -289,7 +522,27 @@ if st.session_state.page == "analysis" and st.session_state.started:
                 max(50, snr * 10)
             )
 
-            c3.metric(
+
+            row1 = st.columns(2)
+            row2 = st.columns(2)
+
+
+            row1[0].metric(
+                "Transit Depth",
+                f"{depth:.2f}%"
+            )
+
+            row1[1].metric(
+                "Data Points",
+                len(flux)
+            )
+
+            row2[0].metric(
+                "Noise",
+                f"{noise:.5f}"
+            )
+
+            row2[1].metric(
                 "Confidence",
                 f"{confidence:.1f}%"
             )
@@ -303,29 +556,57 @@ if st.session_state.page == "analysis" and st.session_state.started:
             flux = flux[:n]
             flux_smooth = flux_smooth[:n]
 
-            fig, ax = plt.subplots(figsize=(7,3))
-            
+            safe_index = min(dip_index, len(time_data)-1)
+            fig, ax = plt.subplots(figsize=(10,4))
 
+            # Light curve line
             ax.plot(
                 time_data,
                 flux,
-                label="Light Curve"
+                linewidth=1.8,
+                label="Stellar Brightness"
             )
-            safe_index = min(dip_index, len(time_data)-1)
 
+            # Transit detection marker
             ax.scatter(
-                time_data[dip_index],
-                flux[dip_index],
+                time_data[safe_index],
+                flux[safe_index],
                 color="red",
-                s=70,
-                label="Detected Transit"
+                s=120,
+                marker="o",
+                label="Transit Detected"
             )
 
-            ax.set_title("Light Curve")
-            ax.set_xlabel("Time")
-            ax.set_ylabel("Flux")
+
+            # Highlight transit area
+            ax.axvspan(
+                time_data[max(0,safe_index-20)],
+                time_data[min(len(time_data)-1,safe_index+20)],
+                alpha=0.2,
+                label="Transit Window"
+            )
+
+
+            ax.set_title(
+                "🛰️ AI Detected Exoplanet Transit",
+                fontsize=14
+            )
+
+            ax.set_xlabel("Time (Days)")
+            ax.set_ylabel("Normalized Flux")
+
+
+            # Grid
+            ax.grid(True, alpha=0.3)
+
 
             ax.legend()
+
+
+            # cleaner layout
+            plt.tight_layout()
+
+
             st.pyplot(fig)
             uncertainty = np.std(flux_smooth)
 
@@ -337,14 +618,77 @@ if st.session_state.page == "analysis" and st.session_state.started:
             # 🌌 AI SIGNAL CLASSIFICATION
             # =========================
 
+            st.markdown("---")
+
+            st.subheader("🪐 AI Detection Result")
+
+            def show_result_box(text, color, icon):
+                st.markdown(f"""
+                <div style="
+                    font-size: 28px;
+                    font-weight: 950;
+                    text-align: center;
+                    padding: 16px;
+                    border-radius: 16px;
+                    background: rgba(255,255,255,0.08);
+                    color: {color};
+                    text-shadow: 0 0 14px {color};
+                    box-shadow: 0 0 25px rgba(0,0,0,0.3);
+                    margin-top: 10px;
+                ">
+                {icon} {text}
+                </div>
+                """, unsafe_allow_html=True)
+
             if depth > 0.5 and confidence >= 80:
-             st.success("🪐 Planet Candidate (Kepler-like weak signal)")
+                show_result_box(
+                    "EXOPLANET CANDIDATE DETECTED",
+                    "#00ff88",
+                    "🪐"
+                )
+                result = "High Probability Transit"
+
+
             elif depth > 0.2 and shape_score < 0.03:
-             st.success("🪐 Planet Candidate (High Probability)")
+                show_result_box(
+                    "EXOPLANET CANDIDATE DETECTED",
+                    "#00ff88",
+                    "🪐"
+                )
+                result = "Planet-like Signal"
+
+
             elif shape_score >= 0.03:
-             st.warning("⚠️ Uncertain Signal")
+
+                show_result_box(
+                    "SIGNAL UNCERTAIN",
+                    "#ffcc00",
+                    "⚠️"
+                )
+
+                result = "Possible False Positive"
+
+
             else:
-              st.warning("⭐ Possible Eclipsing Binary / False Positive")   
+                show_result_box(
+                    "NO STRONG PLANET SIGNAL",
+                    "#ff4d4d",
+                    "⭐"
+                )
+                result = "Low Confidence"
+
+
+            r1, r2 = st.columns(2)
+
+            r1.metric(
+                "Detection Status",
+                result
+            )
+
+            r2.metric(
+                "AI Confidence",
+                f"{confidence:.1f}%"
+            )
             st.write("DEBUG confidence:", confidence)
             st.write("DEBUG shape_score:", shape_score)   
             
@@ -358,7 +702,17 @@ if st.session_state.page == "analysis" and st.session_state.started:
 
     st.markdown("---")
     st.header("🌍 Habitability Index")
-    st.caption("Analyze planetary conditions and estimate habitability.")
+    st.markdown("""
+    <div style="
+        font-size: 20px;
+        font-weight: 600;
+        text-align: left;
+        color: #cfe8ff;
+        margin-bottom: 10px;
+    ">
+    Analyze planetary conditions and estimate habitability
+    </div>
+    """, unsafe_allow_html=True)
 
     habitability_file = st.file_uploader(
         "Upload Exoplanet Data (CSV/FITS)",
@@ -480,8 +834,11 @@ if st.session_state.page == "analysis" and st.session_state.started:
                     else:
                         planet_name = f"Exoplanet {i+1}"
 
-                    st.markdown(f"## 🌍 {planet_name}")
-
+                    st.markdown(
+                        f'<div class="planet-name">🌍 {planet_name}</div>',
+                        unsafe_allow_html=True
+                    )
+                    
                    
                     # =========================
                     # 🌍 PARAMETERS (4 × 3 GRID)
@@ -552,11 +909,30 @@ if st.session_state.page == "analysis" and st.session_state.started:
                     row3[3].empty()
 
                     if score >= 0.75:
-                        st.success("🟢 High Habitability Potential")
+                        label = "🟢 HIGH HABITABILITY POTENTIAL"
+                        color = "#00ff9d"
                     elif score >= 0.5:
-                        st.warning("🟡 Moderate Habitability")
+                        label = "🟡 MODERATE HABITABILITY"
+                        color = "#ffd166"
                     else:
-                        st.error("🔴 Low Habitability")
+                        label = "🔴 LOW HABITABILITY"
+                        color = "#ff4d4d"
+
+                    st.markdown(f"""
+                    <div style="
+                        font-size: 28px;
+                        font-weight: 900;
+                        text-align: center;
+                        padding: 15px;
+                        border-radius: 15px;
+                        margin-top: 30px;        
+                        background: rgba(255,255,255,0.08);
+                        color: {color};
+                        text-shadow: 0 0 10px {color};
+                    ">
+                    {label}
+                    </div>
+                    """, unsafe_allow_html=True)
 
                     st.markdown("---")
 
