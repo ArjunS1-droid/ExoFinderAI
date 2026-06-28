@@ -1,44 +1,58 @@
 import streamlit as st
+
 import pandas as pd
+
 import numpy as np
+
 import matplotlib.pyplot as plt
+
 from astropy.io import fits
+
 import base64
+
 import time
+
 # =========================
 # PAGE SETUP
 # =========================
+
 
 st.set_page_config(
     page_title="EXOPLANET DETECTOR",
     layout="wide"
 )
 
+
 # =========================
 # SESSION STATE
 # =========================
 
+
 if "page" not in st.session_state:
     st.session_state.page = "home"
 
+
 if "started" not in st.session_state:
     st.session_state.started = False
+
 
 # =========================
 # BACKGROUND
 # =========================
 
+
 def get_base64(image_file):
     with open(image_file, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
+
 home_bg = get_base64("space_background.jpg")
 analysis_bg = get_base64("analysis_background.jpg")
+
 
 # =========================
 # CSS
 # =========================
-
 
 
 if st.session_state.page == "home":
@@ -46,9 +60,14 @@ if st.session_state.page == "home":
 else:
     current_bg = analysis_bg
 
+
 st.markdown(f"""
+
+
 <style>
+
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;800&family=Audiowide&display=swap');
+
 .stApp {{
 background-image:url("data:image/jpg;base64,{current_bg}");
 background-size:120% 120%;
@@ -62,6 +81,7 @@ animation:spaceMove 25s infinite alternate ease-in-out;
 0% {{ background-position:0% 0%; }}
 100% {{ background-position:100% 100%; }}
 }}
+
 @keyframes starMove {{
     from {{
         transform: translateY(0px);
@@ -71,6 +91,7 @@ animation:spaceMove 25s infinite alternate ease-in-out;
     }}
 }}
 
+
 [data-testid="stMetricValue"] {{
     font-family: 'Exo 2', sans-serif !important;
     font-size: 30px !important;
@@ -78,6 +99,7 @@ animation:spaceMove 25s infinite alternate ease-in-out;
     color: #F8FAFF !important;
     padding-bottom: 3px;
 }}
+
 
 [data-testid="stMetricLabel"] p {{
     font-family: 'Orbitron', sans-serif !important;
@@ -88,6 +110,8 @@ animation:spaceMove 25s infinite alternate ease-in-out;
     box-shadow: 0 3px 10px rgba(125,249,255,0.5);
     padding-bottom: 3px;
 }}
+
+
 h1 {{
 font-family:'Orbitron', sans-serif !important;
 font-size:42px !important;
@@ -98,6 +122,8 @@ margin-top:-40px !important;
 margin-bottom:50px !important;
 letter-spacing:3px;
 }}
+
+
 .hero {{
     position: absolute;
     top: 110px;
@@ -110,12 +136,17 @@ letter-spacing:3px;
     border-radius: 25px;
     border: 1px solid rgba(255,255,255,0.12);
 }}
+
+
 div[data-testid="stHeading"]
- h2 {{
+
+
+h2 {{
     font-family: 'Exo 2', sans-serif !important;
     font-size: 34px !important;
     font-weight: 700 !important;
 
+    
     background: linear-gradient(
         90deg,
         #7DF9FF,
@@ -128,6 +159,8 @@ div[data-testid="stHeading"]
 
     text-shadow: 0 0 15px rgba(125,249,255,0.3);
 }}
+
+
 .planet-name {{
     font-family: 'Orbitron', sans-serif;
     font-size: 40px;
@@ -139,6 +172,8 @@ div[data-testid="stHeading"]
         0 0 8px rgba(0,0,0,0.9),
         0 0 20px rgba(10,20,40,0.8);
 }}
+
+
 div[data-testid="stMetric"] {{
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(12px);
@@ -155,6 +190,8 @@ div[data-testid="stMetric"] {{
 
     transition: all 0.3s ease;
 }}
+
+
 div[data-testid="stMetric"] > div {{
 
     display: flex !important;
@@ -201,6 +238,8 @@ div[data-testid="stMetricValue"] {{
     text-align: center !important;
 
 }}
+
+
 .stButton button {{
     background: linear-gradient(90deg, #0F2027, #203A43);
     color: white;
@@ -214,17 +253,22 @@ div[data-testid="stMetricValue"] {{
     transition: all 0.3s ease;
 }}
 
+
 .stButton button:hover {{
     transform: scale(1.04);
     box-shadow:
         0 0 10px rgba(0,255,255,0.5),
         0 0 20px rgba(0,255,255,0.3);
 }}
+
+
 div.stButton {{
     margin-top: 350px;
     text-align: center;
     
 }}
+
+
 /* FILE UPLOADER CSS */
 [data-testid="stFileUploaderDropzone"] {{
     padding: 0 !important;
@@ -232,9 +276,12 @@ div.stButton {{
     background: transparent !important;
 }}
 
+
 [data-testid="stFileUploader"] {{
     width: fit-content !important;
 }}
+
+
 .stApp::before {{
     content: "";
     position: fixed;
@@ -246,6 +293,8 @@ div.stButton {{
     z-index: -2;
     pointer-events: none;
 }}
+
+
 .stApp::after {{
     content: "";
     position: fixed;
@@ -269,11 +318,15 @@ div.stButton {{
     z-index: -1;
     pointer-events: none;
 }}
+
+
 /* =========================
    MOBILE RESPONSIVE DESIGN
 ========================= */
 
+
 @media (max-width: 768px) {{
+
 
 h1 {{
 
@@ -335,7 +388,9 @@ div.stButton {{
 }}
 
 }}
+
 </style>
+
 """, unsafe_allow_html=True)
 
 # =========================
